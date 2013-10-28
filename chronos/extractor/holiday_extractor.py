@@ -1,18 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Extract holidays like christmas, new year or other popularly known days."""
+
 import re
 import datetime
 
-
-class Extractor(object):
-    def extract(self, text):
-        raise NotImplementedError
-
-
-class ISODateTimeExtractor(Extractor):
-    def extract(self, text):
-        pass
+from chronos.extractor.base import Extractor
 
 
 class ChristmasExtractor(Extractor):
@@ -24,7 +18,8 @@ class ChristmasExtractor(Extractor):
         matches = self.pattern.findall(text)
         if not matches:
             return []
-            # Get current year
+        
+        # Get current year
         # TODO: Use a reference year
         cur_year = datetime.datetime.today().year
 
@@ -49,7 +44,8 @@ class NewYearExtractor(Extractor):
         matches = self.pattern.findall(text)
         if not matches:
             return []
-            # Get current year
+        
+        # Get current year
         # TODO: Use a reference year
         cur_year = datetime.date.today().year
         next_year = cur_year + 1
@@ -64,3 +60,6 @@ class NewYearExtractor(Extractor):
             result.append(d)
 
         return result
+
+
+__all__ = ['ChristmasExtractor', 'NewYearExtractor']
