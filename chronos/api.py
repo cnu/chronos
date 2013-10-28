@@ -3,13 +3,13 @@
 
 from extractor import *
 
-extractors = [e() for e in Extractor.__subclasses__()]
 
-
-def parse(text):
-    """Parse a string and return a list of dictionaries with date & time info."""
+def parse(text, ref=None):
+    """Parse a string and return list of dictionaries with date & time info."""
     if not text:
         return []
+
+    extractors = [e(ref) for e in Extractor.__subclasses__()]
 
     result = []
     for extractor in extractors:

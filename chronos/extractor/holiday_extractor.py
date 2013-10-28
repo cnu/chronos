@@ -11,18 +11,23 @@ from chronos.extractor.base import Extractor
 
 class ChristmasExtractor(Extractor):
     """Extract Christmas or Christmas Eve from text."""
-    def __init__(self):
+
+    def __init__(self, ref=None):
+        super(ChristmasExtractor, self).__init__(ref)
         # Have patterns for last/next christmas
         self.pattern = re.compile(r"\b(christmas(\seve)*)\b", re.IGNORECASE)
 
     def extract(self, text):
+        """Extract dates with christmas or christmas eve combinations."""
         matches = self.pattern.findall(text)
         if not matches:
             return []
-        
+
         # Get current year
-        # TODO: Use a reference year
-        cur_year = datetime.datetime.today().year
+        if self.ref:
+            cur_year = self.ref.year
+        else:
+            cur_year = datetime.datetime.today().year
 
         result = []
         for match in matches:
@@ -38,18 +43,24 @@ class ChristmasExtractor(Extractor):
 
 class NewYearExtractor(Extractor):
     """Extract New Year or New Year Eve from text."""
-    def __init__(self):
+
+    def __init__(self, ref=None):
+        super(NewYearExtractor, self).__init__(ref)
         # Have patterns for last/next christmas
-        self.pattern = re.compile(r"\b(new\s?year'?s?(\seve)*)\b", re.IGNORECASE)
+        self.pattern = re.compile(r"\b(new\s?year'?s?(\seve)*)\b",
+                                  re.IGNORECASE)
 
     def extract(self, text):
+        """Extract dates with new year or new year eve combinations."""
         matches = self.pattern.findall(text)
         if not matches:
             return []
-        
+
         # Get current year
-        # TODO: Use a reference year
-        cur_year = datetime.date.today().year
+        if self.ref:
+            cur_year = self.ref.year
+        else:
+            cur_year = datetime.date.today().year
         next_year = cur_year + 1
 
         result = []
