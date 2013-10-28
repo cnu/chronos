@@ -10,6 +10,7 @@ from chronos.extractor.base import Extractor
 
 
 class ChristmasExtractor(Extractor):
+    """Extract Christmas or Christmas Eve from text."""
     def __init__(self):
         # Have patterns for last/next christmas
         self.pattern = re.compile(r"\b(christmas(\seve)*)\b", re.IGNORECASE)
@@ -26,16 +27,17 @@ class ChristmasExtractor(Extractor):
         result = []
         for match in matches:
             if len(match[0]) == 13: # christmas eve
-                d = datetime.date(cur_year, 12, 24)
+                date_obj = datetime.date(cur_year, 12, 24)
             elif len(match[0]) == 9: # christmas
-                d = datetime.date(cur_year, 12, 25)
+                date_obj = datetime.date(cur_year, 12, 25)
 
-            result.append(d)
+            result.append(date_obj)
 
         return result
 
 
 class NewYearExtractor(Extractor):
+    """Extract New Year or New Year Eve from text."""
     def __init__(self):
         # Have patterns for last/next christmas
         self.pattern = re.compile(r"\b(new\s?year'?s?(\seve)*)\b", re.IGNORECASE)
@@ -53,11 +55,11 @@ class NewYearExtractor(Extractor):
         result = []
         for match in matches:
             if match[-1]: # new years "eve"
-                d = datetime.date(cur_year, 12, 31)
+                date_obj = datetime.date(cur_year, 12, 31)
             else: # just new years
-                d = datetime.date(next_year, 1, 1)
+                date_obj = datetime.date(next_year, 1, 1)
 
-            result.append(d)
+            result.append(date_obj)
 
         return result
 
