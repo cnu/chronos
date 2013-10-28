@@ -38,3 +38,29 @@ class ChristmasExtractor(Extractor):
             result.append(d)
 
         return result
+
+
+class NewYearExtractor(Extractor):
+    def __init__(self):
+        # Have patterns for last/next christmas
+        self.pattern = re.compile(r"\b(new\s?year'?s?(\seve)*)\b", re.IGNORECASE)
+
+    def extract(self, text):
+        matches = self.pattern.findall(text)
+        if not matches:
+            return []
+            # Get current year
+        # TODO: Use a reference year
+        cur_year = datetime.date.today().year
+        next_year = cur_year + 1
+
+        result = []
+        for match in matches:
+            if match[-1]: # new years "eve"
+                d = datetime.date(cur_year, 12, 31)
+            else: # just new years
+                d = datetime.date(next_year, 1, 1)
+
+            result.append(d)
+
+        return result
