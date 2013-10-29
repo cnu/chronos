@@ -82,5 +82,34 @@ class NewYearTestCase(unittest.TestCase):
         self.assertEqual(newyear, parse("On new Year we", self.ref))
         self.assertEqual(eve, parse("On new year eve we", self.ref))
 
+
+class ISOTestCase(unittest.TestCase):
+    """Test for dates formatted using the ISO 8601 format."""
+
+    def test_basic(self):
+        """Test for basic formats."""
+        self.assertEqual([datetime.datetime(1990, 1, 1)], parse("In 1990-01-01 we"))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10)], parse("In 1990-01-01T10 we"))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10, 10)], parse("In 1990-01-01T10:10 we"))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10, 10, 10)], parse("In 1990-01-01T10:10:10 we"))
+
+        self.assertEqual([datetime.datetime(1990, 1, 1)], parse("In 1990-01-01 we"))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10)], parse("In 1990-01-01t10 we"))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10, 10)], parse("In 1990-01-01t10:10 we"))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10, 10, 10)], parse("In 1990-01-01t10:10:10 we"))
+
+    def test_multiple(self):
+        """Test for basic formats."""
+        text = """In 1990-01-01 and
+                  1990-01-01T10 and
+                  1990-01-01T10:10 and
+                  1990-01-01T10:10:10
+                  we"""
+        output = [datetime.datetime(1990, 1, 1),
+                  datetime.datetime(1990, 1, 1, 10),
+                  datetime.datetime(1990, 1, 1, 10, 10),
+                  datetime.datetime(1990, 1, 1, 10, 10, 10)]
+        self.assertEqual(output, parse(text))
+
 if __name__ == '__main__': # pragma: no cover
     unittest.main()
