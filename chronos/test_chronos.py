@@ -111,5 +111,34 @@ class ISOTestCase(unittest.TestCase):
                   datetime.datetime(1990, 1, 1, 10, 10, 10)]
         self.assertEqual(output, parse(text))
 
+
+class WordDaysTestCase(unittest.TestCase):
+    """Tests for relative days like today, tomorrow, yesterday, etc."""
+    def test_days(self):
+        """Test Today, tomorrow, yesterday, etc."""
+        today = datetime.date.today()
+        one_day = datetime.timedelta(days=1)
+        yesterday = today - one_day
+        tomorrow = today + one_day
+        db_yesterday = yesterday - one_day
+        da_tomorrow = tomorrow + one_day
+
+        self.assertEqual([today], parse("foo today bar"))
+        self.assertEqual([yesterday], parse("foo yesterday bar"))
+        self.assertEqual([tomorrow], parse("foo tomorrow bar"))
+        self.assertEqual([db_yesterday], parse("foo day before yesterday bar"))
+        self.assertEqual([da_tomorrow], parse("foo day after tomorrow bar"))
+
+        self.assertEqual([today], parse("foo Today bar"))
+        self.assertEqual([yesterday], parse("foo Yesterday bar"))
+        self.assertEqual([tomorrow], parse("foo Tomorrow bar"))
+        self.assertEqual([db_yesterday], parse("foo Day Before Yesterday bar"))
+        self.assertEqual([da_tomorrow], parse("foo Day After Tomorrow bar"))
+
+        self.assertEqual([yesterday, today, tomorrow],
+                         parse("foo yesterday, today and tomorrow bar"))
+
+
+
 if __name__ == '__main__': # pragma: no cover
     unittest.main()
