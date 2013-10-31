@@ -18,10 +18,7 @@ develop-eggs
 lib
 lib64
 __pycache__
-<<<<<<< HEAD
 env
-=======
->>>>>>> c2ed05a83cf98d2a7ff8cdd2bd4996264608623c
 
 # Installer logs
 pip-log.txt
@@ -30,10 +27,7 @@ pip-log.txt
 .coverage
 .tox
 nosetests.xml
-<<<<<<< HEAD
 htmlcov
-=======
->>>>>>> c2ed05a83cf98d2a7ff8cdd2bd4996264608623c
 
 # Translations
 *.mo
@@ -42,7 +36,4 @@ htmlcov
 .mr.developer.cfg
 .project
 .pydevproject
-<<<<<<< HEAD
 .idea
-=======
->>>>>>> c2ed05a83cf98d2a7ff8cdd2bd4996264608623c
