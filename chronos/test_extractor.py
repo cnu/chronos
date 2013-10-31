@@ -3,7 +3,7 @@
 
 import unittest
 
-from extractor import Extractor
+from .extractor import Extractor
 
 
 class BaseExtractorTestCase(unittest.TestCase):

@@ -19,6 +19,7 @@ lib
 lib64
 __pycache__
 env
+env3
 
 # Installer logs
 pip-log.txt

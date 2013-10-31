@@ -6,7 +6,7 @@
 import unittest
 import datetime
 
-from api import parse
+from .api import parse
 
 
 class EmptyTestCase(unittest.TestCase):

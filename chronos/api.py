@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from extractor import *
+from .extractor import *
 
 
 def parse(text, ref=None):
