@@ -138,6 +138,21 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([yesterday, today, tomorrow],
                          parse("foo yesterday, today and tomorrow bar"))
 
+    def test_n_days(self):
+        """Test N days ago, in N days, etc."""
+        today = datetime.date.today()
+        self.assertEqual([today - datetime.timedelta(days=3)], parse("foo 3 days back bar"))
+        self.assertEqual([today - datetime.timedelta(days=10)], parse("foo 10 days ago bar"))
+        self.assertEqual([today + datetime.timedelta(days=3)], parse("foo in 3 days bar"))
+        self.assertEqual([today + datetime.timedelta(days=10)], parse("foo in 10 days bar"))
+
+        self.assertEqual([today + datetime.timedelta(days=10),
+                          today - datetime.timedelta(days=3)],
+                         parse("foo in 10 days and 3 days back bar"))
+        self.assertEqual([], parse("foo in 10 days ago bar"))
+
+        self.assertEqual([], parse("foo in a while bar"))
+        self.assertEqual([], parse("foo short while ago bar "))
 
 
 if __name__ == '__main__': # pragma: no cover

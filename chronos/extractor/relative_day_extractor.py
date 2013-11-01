@@ -10,17 +10,26 @@ from chronos.extractor.base import Extractor
 
 
 class RelativeDayExtractor(Extractor):
-
     def __init__(self, ref=None):
         super(RelativeDayExtractor, self).__init__(ref)
-        self.pattern = re.compile(r"""\b(day before yesterday|day after tomorrow|yesterday|tomorrow|today)\b""",
-                                  re.IGNORECASE)
+        self.patterns = {re.compile(r"""\b(day before yesterday|day after tomorrow|yesterday|tomorrow|today)\b""",
+                                    re.IGNORECASE): self.__extract_day,
+                         re.compile(r'\b(next|in)* ?(\d+) days ?(ago|back)*\b',
+                                    re.IGNORECASE): self.__extract_relative_days}
 
     def extract(self, text):
-        """Extract ISO formatted dates and time."""
+        """Extract all types of relative patterns."""
         result = []
-        matches = self.pattern.findall(text)
+        for pattern, functor in self.patterns.items():
+            matches = pattern.findall(text)
+            result.extend(functor(matches))
 
+        return result
+
+    @staticmethod
+    def __extract_day(matches):
+        """Extract today, tomorrow, yesterday, etc."""
+        result = []
         today = datetime.date.today()
         one_day = datetime.timedelta(days=1)
         yesterday = today - one_day
@@ -40,5 +49,25 @@ class RelativeDayExtractor(Extractor):
                 result.append(db_yesterday)
             elif match_lower == 'day after tomorrow':
                 result.append(da_tomorrow)
+
+        return result
+
+    @staticmethod
+    def __extract_relative_days(matches):
+        """Extract phrases like "in N days", "N days ago", etc."""
+        result = []
+        today = datetime.date.today()
+
+        for match in matches:
+            days = int(match[1])
+            delta = datetime.timedelta(days=days)
+
+            if match[0] and match[2]:  # both in and ago doesn't make sense
+                continue
+
+            if match[0]:  # either of next or in
+                result.append(today + delta)
+            elif match[2]:  # either ago or back
+                result.append(today - delta)
 
         return result
