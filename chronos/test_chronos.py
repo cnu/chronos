@@ -154,6 +154,12 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo in a while bar"))
         self.assertEqual([], parse("foo short while ago bar "))
 
+        self.assertEqual([today + datetime.timedelta(days=1)], parse("foo in a day bar"))
+        self.assertEqual([today - datetime.timedelta(days=1)], parse("foo a day ago bar"))
+        self.assertEqual([today - datetime.timedelta(days=1)], parse("foo a day back bar"))
+        self.assertEqual([], parse("foo next a day bar"))
+        self.assertEqual([], parse("foo in a day ago bar"))
+        self.assertEqual([], parse("foo in a day back bar"))
 
 if __name__ == '__main__': # pragma: no cover
     unittest.main()
