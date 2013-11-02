@@ -161,5 +161,28 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo in a day ago bar"))
         self.assertEqual([], parse("foo in a day back bar"))
 
+    def test_n_weeks(self):
+        """Test N weeks ago, in N weeks, etc."""
+        today = datetime.date.today()
+        self.assertEqual([today - datetime.timedelta(weeks=3)], parse("foo 3 weeks back bar"))
+        self.assertEqual([today - datetime.timedelta(weeks=10)], parse("foo 10 weeks ago bar"))
+        self.assertEqual([today + datetime.timedelta(weeks=3)], parse("foo in 3 weeks bar"))
+        self.assertEqual([today + datetime.timedelta(weeks=10)], parse("foo in 10 weeks bar"))
+
+        self.assertEqual([today + datetime.timedelta(weeks=10),
+                          today - datetime.timedelta(weeks=3)],
+                         parse("foo in 10 weeks and 3 weeks back bar"))
+        self.assertEqual([], parse("foo in 10 weeks ago bar"))
+
+        self.assertEqual([], parse("foo in a while bar"))
+        self.assertEqual([], parse("foo short while ago bar "))
+
+        self.assertEqual([today + datetime.timedelta(weeks=1)], parse("foo in a week bar"))
+        self.assertEqual([today - datetime.timedelta(weeks=1)], parse("foo a week ago bar"))
+        self.assertEqual([today - datetime.timedelta(weeks=1)], parse("foo a week back bar"))
+        self.assertEqual([], parse("foo next a week bar"))
+        self.assertEqual([], parse("foo in a week ago bar"))
+        self.assertEqual([], parse("foo in a week back bar"))
+
 if __name__ == '__main__': # pragma: no cover
     unittest.main()
