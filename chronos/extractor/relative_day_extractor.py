@@ -14,7 +14,7 @@ class RelativeDayExtractor(Extractor):
         super(RelativeDayExtractor, self).__init__(ref)
         self.patterns = {re.compile(r"""\b(day before yesterday|day after tomorrow|yesterday|tomorrow|today)\b""",
                                     re.IGNORECASE): self.__extract_day,
-                         re.compile(r'\b(next|in)* ?(\d+|a) (week|day)s? ?(ago|back)*\b',
+                         re.compile(r'\b(next|in)* ?(\d+|a) (year|month|week|day)s? ?(ago|back)*\b',
                                     re.IGNORECASE): self.__extract_relative_days}
 
     def extract(self, text):
@@ -70,6 +70,12 @@ class RelativeDayExtractor(Extractor):
                 delta = datetime.timedelta(days=num)
             elif match[2] == 'week':
                 delta = datetime.timedelta(weeks=num)
+            elif match[2] == 'month':
+                # assuming 30 days to a month
+                delta = datetime.timedelta(days=num*30)
+            elif match[2] == 'year':
+                # assuming 365 days to a year
+                delta = datetime.timedelta(days=num*365)
 
             if match[0] and match[3]:  # both in and ago doesn't make sense
                 continue

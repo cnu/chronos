@@ -184,5 +184,51 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo in a week ago bar"))
         self.assertEqual([], parse("foo in a week back bar"))
 
+    def test_n_months(self):
+        """Test N months ago, in N months, etc."""
+        today = datetime.date.today()
+        self.assertEqual([today - datetime.timedelta(days=3*30)], parse("foo 3 months back bar"))
+        self.assertEqual([today - datetime.timedelta(days=10*30)], parse("foo 10 months ago bar"))
+        self.assertEqual([today + datetime.timedelta(days=3*30)], parse("foo in 3 months bar"))
+        self.assertEqual([today + datetime.timedelta(days=10*30)], parse("foo in 10 months bar"))
+
+        self.assertEqual([today + datetime.timedelta(days=10*30),
+                          today - datetime.timedelta(days=3*30)],
+                         parse("foo in 10 months and 3 months back bar"))
+        self.assertEqual([], parse("foo in 10 months ago bar"))
+
+        self.assertEqual([], parse("foo in a while bar"))
+        self.assertEqual([], parse("foo short while ago bar "))
+
+        self.assertEqual([today + datetime.timedelta(days=1*30)], parse("foo in a month bar"))
+        self.assertEqual([today - datetime.timedelta(days=1*30)], parse("foo a month ago bar"))
+        self.assertEqual([today - datetime.timedelta(days=1*30)], parse("foo a month back bar"))
+        self.assertEqual([], parse("foo next a month bar"))
+        self.assertEqual([], parse("foo in a month ago bar"))
+        self.assertEqual([], parse("foo in a month back bar"))
+
+    def test_n_years(self):
+        """Test N years ago, in N years, etc."""
+        today = datetime.date.today()
+        self.assertEqual([today - datetime.timedelta(days=3*365)], parse("foo 3 years back bar"))
+        self.assertEqual([today - datetime.timedelta(days=10*365)], parse("foo 10 years ago bar"))
+        self.assertEqual([today + datetime.timedelta(days=3*365)], parse("foo in 3 years bar"))
+        self.assertEqual([today + datetime.timedelta(days=10*365)], parse("foo in 10 years bar"))
+
+        self.assertEqual([today + datetime.timedelta(days=10*365),
+                          today - datetime.timedelta(days=3*365)],
+                         parse("foo in 10 years and 3 years back bar"))
+        self.assertEqual([], parse("foo in 10 years ago bar"))
+
+        self.assertEqual([], parse("foo in a while bar"))
+        self.assertEqual([], parse("foo short while ago bar "))
+
+        self.assertEqual([today + datetime.timedelta(days=1*365)], parse("foo in a year bar"))
+        self.assertEqual([today - datetime.timedelta(days=1*365)], parse("foo a year ago bar"))
+        self.assertEqual([today - datetime.timedelta(days=1*365)], parse("foo a year back bar"))
+        self.assertEqual([], parse("foo next a year bar"))
+        self.assertEqual([], parse("foo in a year ago bar"))
+        self.assertEqual([], parse("foo in a year back bar"))
+
 if __name__ == '__main__': # pragma: no cover
     unittest.main()
