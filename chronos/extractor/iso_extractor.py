@@ -14,15 +14,6 @@ class ISO8601Extractor(Extractor):
 
     def __init__(self, ref=None):
         super(ISO8601Extractor, self).__init__(ref)
-        self.load_patterns()
-
-    def load_patterns(self):
-        """Load a list of possible patterns to check the text for.
-
-        Patterns should be loaded in the longest first order
-        so that text containing date & time are found before text containing
-        just date.
-        """
         # Using pattern from http://stackoverflow.com/a/8270148/1448
         self.pattern = re.compile(r"""(
                                         \d{4}\-\d\d\-\d\d  # date
