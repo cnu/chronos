@@ -15,7 +15,9 @@ class RelativeDayExtractor(Extractor):
         self.patterns = {re.compile(r"""\b(day before yesterday|day after tomorrow|yesterday|tomorrow|today)\b""",
                                     re.IGNORECASE): self.__extract_day,
                          re.compile(r'\b(next|in)* ?(\d+|a) (year|month|week|day)s? ?(ago|back)*\b',
-                                    re.IGNORECASE): self.__extract_relative_days}
+                                    re.IGNORECASE): self.__extract_relative_days,
+                         re.compile(r'\b(last|next) (year|month|week)\b',
+                                    re.IGNORECASE): self.__extract_last_next}
 
     def extract(self, text):
         """Extract all types of relative patterns."""
@@ -86,3 +88,24 @@ class RelativeDayExtractor(Extractor):
                 result.append(today - delta)
 
         return result
+
+    @staticmethod
+    def __extract_last_next(matches):
+        """Extract from matches like last/next week/month/year combinations."""
+        result = []
+        today = datetime.date.today()
+
+        for match in matches:
+            if match[1] == 'week':
+                delta = datetime.timedelta(weeks=1)
+            elif match[1] == 'month':
+                delta = datetime.timedelta(days=30)
+            elif match[1] == 'year':
+                delta = datetime.timedelta(days=365)
+
+            if match[0] == 'last':
+                result.append(today - delta)
+            elif match[0] == 'next':
+                result.append(today + delta)
+        return result
+

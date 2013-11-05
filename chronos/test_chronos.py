@@ -230,5 +230,27 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo in a year ago bar"))
         self.assertEqual([], parse("foo in a year back bar"))
 
+    def test_last_next(self):
+        """Test last/next week/month/year combinations."""
+        today = datetime.date.today()
+        self.assertEqual([today - datetime.timedelta(weeks=1)], parse("foo last week bar"))
+        self.assertEqual([today - datetime.timedelta(days=30)], parse("foo last month bar"))
+        self.assertEqual([today - datetime.timedelta(days=365)], parse("foo last year bar"))
+
+        self.assertEqual([today + datetime.timedelta(weeks=1)], parse("foo next week bar"))
+        self.assertEqual([today + datetime.timedelta(days=30)], parse("foo next month bar"))
+        self.assertEqual([today + datetime.timedelta(days=365)], parse("foo next year bar"))
+
+        self.assertEqual([], parse("foo last weeks bar"))
+        self.assertEqual([], parse("foo last months bar"))
+        self.assertEqual([], parse("foo last years bar"))
+
+        self.assertEqual([], parse("foo next weeks bar"))
+        self.assertEqual([], parse("foo next months bar"))
+        self.assertEqual([], parse("foo next years bar"))
+
+
+
+
 if __name__ == '__main__': # pragma: no cover
     unittest.main()
