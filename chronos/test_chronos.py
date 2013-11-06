@@ -114,6 +114,7 @@ class ISOTestCase(unittest.TestCase):
 
 class WordDaysTestCase(unittest.TestCase):
     """Tests for relative days like today, tomorrow, yesterday, etc."""
+    ref = datetime.datetime.utcfromtimestamp(259200000)
     def test_days(self):
         """Test Today, tomorrow, yesterday, etc."""
         today = datetime.date.today()
@@ -249,6 +250,140 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo next months bar"))
         self.assertEqual([], parse("foo next years bar"))
 
+    def test_days_ref(self):
+        """Test Today, tomorrow, yesterday, etc."""
+        today = datetime.date.fromtimestamp(259200000)
+        one_day = datetime.timedelta(days=1)
+        yesterday = today - one_day
+        tomorrow = today + one_day
+        db_yesterday = yesterday - one_day
+        da_tomorrow = tomorrow + one_day
+
+        self.assertEqual([today], parse("foo today bar", self.ref))
+        self.assertEqual([yesterday], parse("foo yesterday bar", self.ref))
+        self.assertEqual([tomorrow], parse("foo tomorrow bar", self.ref))
+        self.assertEqual([db_yesterday], parse("foo day before yesterday bar", self.ref))
+        self.assertEqual([da_tomorrow], parse("foo day after tomorrow bar", self.ref))
+
+        self.assertEqual([today], parse("foo Today bar", self.ref))
+        self.assertEqual([yesterday], parse("foo Yesterday bar", self.ref))
+        self.assertEqual([tomorrow], parse("foo Tomorrow bar", self.ref))
+        self.assertEqual([db_yesterday], parse("foo Day Before Yesterday bar", self.ref))
+        self.assertEqual([da_tomorrow], parse("foo Day After Tomorrow bar", self.ref))
+
+        self.assertEqual([yesterday, today, tomorrow],
+                         parse("foo yesterday, today and tomorrow bar", self.ref))
+
+    def test_n_days_ref(self):
+        """Test N days ago, in N days, etc."""
+        today = datetime.date.fromtimestamp(259200000)
+        self.assertEqual([today - datetime.timedelta(days=3)], parse("foo 3 days back bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=10)], parse("foo 10 days ago bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(days=3)], parse("foo in 3 days bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(days=10)], parse("foo in 10 days bar", self.ref))
+
+        self.assertEqual([today + datetime.timedelta(days=10),
+                          today - datetime.timedelta(days=3)],
+                         parse("foo in 10 days and 3 days back bar", self.ref))
+        self.assertEqual([], parse("foo in 10 days ago bar", self.ref))
+
+        self.assertEqual([], parse("foo in a while bar", self.ref))
+        self.assertEqual([], parse("foo short while ago bar ", self.ref))
+
+        self.assertEqual([today + datetime.timedelta(days=1)], parse("foo in a day bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=1)], parse("foo a day ago bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=1)], parse("foo a day back bar", self.ref))
+        self.assertEqual([], parse("foo next a day bar", self.ref))
+        self.assertEqual([], parse("foo in a day ago bar", self.ref))
+        self.assertEqual([], parse("foo in a day back bar", self.ref))
+
+    def test_n_weeks_ref(self):
+        """Test N weeks ago, in N weeks, etc."""
+        today = datetime.date.fromtimestamp(259200000)
+        self.assertEqual([today - datetime.timedelta(weeks=3)], parse("foo 3 weeks back bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(weeks=10)], parse("foo 10 weeks ago bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(weeks=3)], parse("foo in 3 weeks bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(weeks=10)], parse("foo in 10 weeks bar", self.ref))
+
+        self.assertEqual([today + datetime.timedelta(weeks=10),
+                          today - datetime.timedelta(weeks=3)],
+                         parse("foo in 10 weeks and 3 weeks back bar", self.ref))
+        self.assertEqual([], parse("foo in 10 weeks ago bar", self.ref))
+
+        self.assertEqual([], parse("foo in a while bar", self.ref))
+        self.assertEqual([], parse("foo short while ago bar ", self.ref))
+
+        self.assertEqual([today + datetime.timedelta(weeks=1)], parse("foo in a week bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(weeks=1)], parse("foo a week ago bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(weeks=1)], parse("foo a week back bar", self.ref))
+        self.assertEqual([], parse("foo next a week bar", self.ref))
+        self.assertEqual([], parse("foo in a week ago bar", self.ref))
+        self.assertEqual([], parse("foo in a week back bar", self.ref))
+
+    def test_n_months_ref(self):
+        """Test N months ago, in N months, etc."""
+        today = datetime.date.fromtimestamp(259200000)
+        self.assertEqual([today - datetime.timedelta(days=3*30)], parse("foo 3 months back bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=10*30)], parse("foo 10 months ago bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(days=3*30)], parse("foo in 3 months bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(days=10*30)], parse("foo in 10 months bar", self.ref))
+
+        self.assertEqual([today + datetime.timedelta(days=10*30),
+                          today - datetime.timedelta(days=3*30)],
+                         parse("foo in 10 months and 3 months back bar", self.ref))
+        self.assertEqual([], parse("foo in 10 months ago bar", self.ref))
+
+        self.assertEqual([], parse("foo in a while bar", self.ref))
+        self.assertEqual([], parse("foo short while ago bar ", self.ref))
+
+        self.assertEqual([today + datetime.timedelta(days=1*30)], parse("foo in a month bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=1*30)], parse("foo a month ago bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=1*30)], parse("foo a month back bar", self.ref))
+        self.assertEqual([], parse("foo next a month bar", self.ref))
+        self.assertEqual([], parse("foo in a month ago bar", self.ref))
+        self.assertEqual([], parse("foo in a month back bar", self.ref))
+
+    def test_n_years_ref(self):
+        """Test N years ago, in N years, etc."""
+        today = datetime.date.fromtimestamp(259200000)
+        self.assertEqual([today - datetime.timedelta(days=3*365)], parse("foo 3 years back bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=10*365)], parse("foo 10 years ago bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(days=3*365)], parse("foo in 3 years bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(days=10*365)], parse("foo in 10 years bar", self.ref))
+
+        self.assertEqual([today + datetime.timedelta(days=10*365),
+                          today - datetime.timedelta(days=3*365)],
+                         parse("foo in 10 years and 3 years back bar", self.ref))
+        self.assertEqual([], parse("foo in 10 years ago bar", self.ref))
+
+        self.assertEqual([], parse("foo in a while bar", self.ref))
+        self.assertEqual([], parse("foo short while ago bar ", self.ref))
+
+        self.assertEqual([today + datetime.timedelta(days=1*365)], parse("foo in a year bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=1*365)], parse("foo a year ago bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=1*365)], parse("foo a year back bar", self.ref))
+        self.assertEqual([], parse("foo next a year bar", self.ref))
+        self.assertEqual([], parse("foo in a year ago bar", self.ref))
+        self.assertEqual([], parse("foo in a year back bar", self.ref))
+
+    def test_last_next_ref(self):
+        """Test last/next week/month/year combinations."""
+        today = datetime.date.fromtimestamp(259200000)
+        self.assertEqual([today - datetime.timedelta(weeks=1)], parse("foo last week bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=30)], parse("foo last month bar", self.ref))
+        self.assertEqual([today - datetime.timedelta(days=365)], parse("foo last year bar", self.ref))
+
+        self.assertEqual([today + datetime.timedelta(weeks=1)], parse("foo next week bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(days=30)], parse("foo next month bar", self.ref))
+        self.assertEqual([today + datetime.timedelta(days=365)], parse("foo next year bar", self.ref))
+
+        self.assertEqual([], parse("foo last weeks bar", self.ref))
+        self.assertEqual([], parse("foo last months bar", self.ref))
+        self.assertEqual([], parse("foo last years bar", self.ref))
+
+        self.assertEqual([], parse("foo next weeks bar", self.ref))
+        self.assertEqual([], parse("foo next months bar", self.ref))
+        self.assertEqual([], parse("foo next years bar", self.ref))
 
 
 

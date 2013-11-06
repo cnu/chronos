@@ -19,6 +19,11 @@ class RelativeDayExtractor(Extractor):
                          re.compile(r'\b(last|next) (year|month|week)\b',
                                     re.IGNORECASE): self.__extract_last_next}
 
+        if ref:
+            self.today = ref.date()
+        else:
+            self.today = datetime.date.today()
+
     def extract(self, text):
         """Extract all types of relative patterns."""
         result = []
@@ -28,14 +33,12 @@ class RelativeDayExtractor(Extractor):
 
         return result
 
-    @staticmethod
-    def __extract_day(matches):
+    def __extract_day(self, matches):
         """Extract today, tomorrow, yesterday, etc."""
         result = []
-        today = datetime.date.today()
         one_day = datetime.timedelta(days=1)
-        yesterday = today - one_day
-        tomorrow = today + one_day
+        yesterday = self.today - one_day
+        tomorrow = self.today + one_day
         db_yesterday = yesterday - one_day
         da_tomorrow = tomorrow + one_day
 
@@ -46,7 +49,7 @@ class RelativeDayExtractor(Extractor):
             elif match_lower == 'tomorrow':
                 result.append(tomorrow)
             elif match_lower == 'today':
-                result.append(today)
+                result.append(self.today)
             elif match_lower == 'day before yesterday':
                 result.append(db_yesterday)
             elif match_lower == 'day after tomorrow':
@@ -54,20 +57,21 @@ class RelativeDayExtractor(Extractor):
 
         return result
 
-    @staticmethod
-    def __extract_relative_days(matches):
+    def __extract_relative_days(self, matches):
         """Extract phrases like "in N days", "N days ago", etc."""
         result = []
-        today = datetime.date.today()
-
         for match in matches:
-            try:
-                num = int(match[1])
-            except ValueError:
-                if match[1] == 'a' and match[0] != 'next':
-                    num = 1
-                else:
+            if match[1] == 'a':
+                # For "in a week", "a week back", "a week ago", etc.
+                if match[0] == 'next':
+                    # "next a week" doesn't make sense
                     continue
+                else:
+                    num = 1
+            else:
+                # in N days, N weeks back, N years ago, etc.
+                num = int(match[1])
+
             if match[2] == 'day':
                 delta = datetime.timedelta(days=num)
             elif match[2] == 'week':
@@ -83,18 +87,15 @@ class RelativeDayExtractor(Extractor):
                 continue
 
             if match[0]:  # either of next or in
-                result.append(today + delta)
+                result.append(self.today + delta)
             elif match[3]:  # either ago or back
-                result.append(today - delta)
+                result.append(self.today - delta)
 
         return result
 
-    @staticmethod
-    def __extract_last_next(matches):
+    def __extract_last_next(self, matches):
         """Extract from matches like last/next week/month/year combinations."""
         result = []
-        today = datetime.date.today()
-
         for match in matches:
             if match[1] == 'week':
                 delta = datetime.timedelta(weeks=1)
@@ -104,8 +105,8 @@ class RelativeDayExtractor(Extractor):
                 delta = datetime.timedelta(days=365)
 
             if match[0] == 'last':
-                result.append(today - delta)
+                result.append(self.today - delta)
             elif match[0] == 'next':
-                result.append(today + delta)
+                result.append(self.today + delta)
         return result
 
