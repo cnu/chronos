@@ -85,6 +85,7 @@ class NewYearTestCase(unittest.TestCase):
 
 class ISOTestCase(unittest.TestCase):
     """Test for dates formatted using the ISO 8601 format."""
+    ref = datetime.datetime.utcfromtimestamp(25920000)
 
     def test_basic(self):
         """Test for basic formats."""
@@ -99,7 +100,7 @@ class ISOTestCase(unittest.TestCase):
         self.assertEqual([datetime.datetime(1990, 1, 1, 10, 10, 10)], parse("In 1990-01-01t10:10:10 we"))
 
     def test_multiple(self):
-        """Test for basic formats."""
+        """Test for basic formats with multiple dates."""
         text = """In 1990-01-01 and
                   1990-01-01T10 and
                   1990-01-01T10:10 and
@@ -110,6 +111,31 @@ class ISOTestCase(unittest.TestCase):
                   datetime.datetime(1990, 1, 1, 10, 10),
                   datetime.datetime(1990, 1, 1, 10, 10, 10)]
         self.assertEqual(output, parse(text))
+
+    def test_basic_ref(self):
+        """Test for basic formats with ref date. Output should be same."""
+        self.assertEqual([datetime.datetime(1990, 1, 1)], parse("In 1990-01-01 we", self.ref))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10)], parse("In 1990-01-01T10 we", self.ref))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10, 10)], parse("In 1990-01-01T10:10 we", self.ref))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10, 10, 10)], parse("In 1990-01-01T10:10:10 we", self.ref))
+
+        self.assertEqual([datetime.datetime(1990, 1, 1)], parse("In 1990-01-01 we", self.ref))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10)], parse("In 1990-01-01t10 we", self.ref))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10, 10)], parse("In 1990-01-01t10:10 we", self.ref))
+        self.assertEqual([datetime.datetime(1990, 1, 1, 10, 10, 10)], parse("In 1990-01-01t10:10:10 we", self.ref))
+
+    def test_multiple_ref(self):
+        """Test for basic formats with multiple dates with ref date. Output should be same."""
+        text = """In 1990-01-01 and
+                  1990-01-01T10 and
+                  1990-01-01T10:10 and
+                  1990-01-01T10:10:10
+                  we"""
+        output = [datetime.datetime(1990, 1, 1),
+                  datetime.datetime(1990, 1, 1, 10),
+                  datetime.datetime(1990, 1, 1, 10, 10),
+                  datetime.datetime(1990, 1, 1, 10, 10, 10)]
+        self.assertEqual(output, parse(text, self.ref))
 
 
 class WordDaysTestCase(unittest.TestCase):
