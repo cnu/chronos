@@ -251,7 +251,7 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo next years bar"))
 
     def test_days_ref(self):
-        """Test Today, tomorrow, yesterday, etc."""
+        """Test Today, tomorrow, yesterday, etc., with ref date"""
         today = datetime.date.fromtimestamp(259200000)
         one_day = datetime.timedelta(days=1)
         yesterday = today - one_day
@@ -275,7 +275,7 @@ class WordDaysTestCase(unittest.TestCase):
                          parse("foo yesterday, today and tomorrow bar", self.ref))
 
     def test_n_days_ref(self):
-        """Test N days ago, in N days, etc."""
+        """Test N days ago, in N days, etc., with ref date"""
         today = datetime.date.fromtimestamp(259200000)
         self.assertEqual([today - datetime.timedelta(days=3)], parse("foo 3 days back bar", self.ref))
         self.assertEqual([today - datetime.timedelta(days=10)], parse("foo 10 days ago bar", self.ref))
@@ -298,7 +298,7 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo in a day back bar", self.ref))
 
     def test_n_weeks_ref(self):
-        """Test N weeks ago, in N weeks, etc."""
+        """Test N weeks ago, in N weeks, etc., with ref date"""
         today = datetime.date.fromtimestamp(259200000)
         self.assertEqual([today - datetime.timedelta(weeks=3)], parse("foo 3 weeks back bar", self.ref))
         self.assertEqual([today - datetime.timedelta(weeks=10)], parse("foo 10 weeks ago bar", self.ref))
@@ -321,7 +321,7 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo in a week back bar", self.ref))
 
     def test_n_months_ref(self):
-        """Test N months ago, in N months, etc."""
+        """Test N months ago, in N months, etc., with ref date"""
         today = datetime.date.fromtimestamp(259200000)
         self.assertEqual([today - datetime.timedelta(days=3*30)], parse("foo 3 months back bar", self.ref))
         self.assertEqual([today - datetime.timedelta(days=10*30)], parse("foo 10 months ago bar", self.ref))
@@ -344,7 +344,7 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo in a month back bar", self.ref))
 
     def test_n_years_ref(self):
-        """Test N years ago, in N years, etc."""
+        """Test N years ago, in N years, etc., with ref date"""
         today = datetime.date.fromtimestamp(259200000)
         self.assertEqual([today - datetime.timedelta(days=3*365)], parse("foo 3 years back bar", self.ref))
         self.assertEqual([today - datetime.timedelta(days=10*365)], parse("foo 10 years ago bar", self.ref))
@@ -367,7 +367,7 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo in a year back bar", self.ref))
 
     def test_last_next_ref(self):
-        """Test last/next week/month/year combinations."""
+        """Test last/next week/month/year combinations., with ref date"""
         today = datetime.date.fromtimestamp(259200000)
         self.assertEqual([today - datetime.timedelta(weeks=1)], parse("foo last week bar", self.ref))
         self.assertEqual([today - datetime.timedelta(days=30)], parse("foo last month bar", self.ref))
