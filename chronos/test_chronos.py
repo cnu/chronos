@@ -411,6 +411,65 @@ class WordDaysTestCase(unittest.TestCase):
         self.assertEqual([], parse("foo next months bar", self.ref))
         self.assertEqual([], parse("foo next years bar", self.ref))
 
+    def test_last_next_day(self):
+        """Test last friday, next wednesday, etc kind of dates."""
+        today = datetime.date.today()
+        # Get the relative date of wednesday dynamically based on today
+        # last wednesday
+        today_day = today.weekday()
+        if today_day >= 2: # wednesday is index 2 of weekdays
+            if today_day - 2 == 0:
+                delta = datetime.timedelta(days=7)
+            else:
+                delta = datetime.timedelta(days=today_day - 2)
+        else:
+            delta = datetime.timedelta(days=7 - today_day)
+        last_wed = today - delta
+        # next wednesday
+        if today_day >= 2:
+            delta = datetime.timedelta(days=9 - today_day)  # 7 days in a week - today's weekday + 2 (wednesday)
+        else:
+            delta = datetime.timedelta(days=2 - today_day)
+        next_wed = today + delta
+
+        # last saturday
+        if today_day >= 5: # saturday is index 5 of weekdays
+            if today_day - 5 == 0:
+                delta = datetime.timedelta(days=7)
+            else:
+                delta = datetime.timedelta(days=today_day - 5)
+        else:
+            delta = datetime.timedelta(days=7 - today_day)
+        last_sat = today - delta
+        # next saturday
+        if today_day >= 5:
+            delta = datetime.timedelta(days=12 - today_day)  # 7 days in a week - today's weekday + 5 (saturday)
+        else:
+            delta = datetime.timedelta(days=5 - today_day)
+        next_sat = today + delta
+
+        # last friday
+        if today_day >= 4: # friday is index 4 of weekdays
+            if today_day - 4 == 0:
+                delta = datetime.timedelta(days=7)
+            else:
+                delta = datetime.timedelta(days=today_day - 4)
+        else:
+            delta = datetime.timedelta(days=7 - today_day)
+        last_fri = today - delta
+        # next friday
+        if today_day >= 4:
+            delta = datetime.timedelta(days=11 - today_day)  # 7 days in a week - today's weekday + 4 (friday)
+        else:
+            delta = datetime.timedelta(days=4 - today_day)
+        next_fri = today + delta
+
+        self.assertEqual([last_wed], parse("foo last Wednesday bar"))
+        self.assertEqual([next_wed], parse("foo next wednesday bar"))
+        self.assertEqual([last_sat], parse("foo last Saturday bar"))
+        self.assertEqual([next_sat], parse("foo next saturday bar"))
+        self.assertEqual([last_fri], parse("foo last Friday bar"))
+        self.assertEqual([next_fri], parse("foo next friday bar"))
 
 
 if __name__ == '__main__': # pragma: no cover

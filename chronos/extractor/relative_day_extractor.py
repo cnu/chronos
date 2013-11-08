@@ -17,7 +17,10 @@ class RelativeDayExtractor(Extractor):
                          re.compile(r'\b(next|in)* ?(\d+|a) (year|month|week|day)s? ?(ago|back)*\b',
                                     re.IGNORECASE): self.__extract_relative_days,
                          re.compile(r'\b(last|next) (year|month|week)\b',
-                                    re.IGNORECASE): self.__extract_last_next}
+                                    re.IGNORECASE): self.__extract_last_next,
+                         re.compile(r'\b(last|next) (monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b',
+                                    re.IGNORECASE): self.__extract_last_next_day,
+                         }
 
         if ref:
             self.today = ref.date()
@@ -110,3 +113,28 @@ class RelativeDayExtractor(Extractor):
                 result.append(self.today + delta)
         return result
 
+    def __extract_last_next_day(self, matches):
+        """Extract matches with last wednesday, next friday, etc."""
+        result = []
+        today = datetime.date.today()
+        today_num = today.weekday()
+        days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        day_num = dict([(day, i) for i, day in enumerate(days)])
+        for match in matches:
+            match_num = day_num[match[1].lower()]
+            if match[0] == 'last':
+                if today_num >= match_num:
+                    if today_num - match_num == 0: # matched day is also today
+                        delta = datetime.timedelta(days=7)
+                    else:
+                        delta = datetime.timedelta(days=today_num - match_num)
+                else:
+                    delta = datetime.timedelta(days=7-today_num)
+                result.append(today - delta)
+            elif match[0] == 'next':
+                if today_num >= match_num:
+                    delta = datetime.timedelta(days=7 + match_num - today_num)
+                else:
+                    delta = datetime.timedelta(match_num - today_num)
+                result.append(today + delta)
+        return result
