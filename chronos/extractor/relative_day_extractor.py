@@ -116,8 +116,7 @@ class RelativeDayExtractor(Extractor):
     def __extract_last_next_day(self, matches):
         """Extract matches with last wednesday, next friday, etc."""
         result = []
-        today = datetime.date.today()
-        today_num = today.weekday()
+        today_num = self.today.weekday()
         days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
         day_num = dict([(day, i) for i, day in enumerate(days)])
         for match in matches:
@@ -130,11 +129,11 @@ class RelativeDayExtractor(Extractor):
                         delta = datetime.timedelta(days=today_num - match_num)
                 else:
                     delta = datetime.timedelta(days=7-today_num)
-                result.append(today - delta)
+                result.append(self.today - delta)
             elif match[0] == 'next':
                 if today_num >= match_num:
                     delta = datetime.timedelta(days=7 + match_num - today_num)
                 else:
                     delta = datetime.timedelta(match_num - today_num)
-                result.append(today + delta)
+                result.append(self.today + delta)
         return result
